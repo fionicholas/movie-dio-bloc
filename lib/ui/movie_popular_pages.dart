@@ -92,7 +92,7 @@ class BuildList extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(bottom : 8.0),
+                            padding: const EdgeInsets.only(bottom : 8.0, right: 8.0),
                             child: Text(movies.overview.substring(0, 100)),
                           ),
                         ],
