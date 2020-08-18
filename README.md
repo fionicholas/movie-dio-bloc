@@ -1,6 +1,6 @@
-# dio_sample_app
+# Movie App with DIO and BLOC
 
-Sample App with DIO
+Simple App with DIO and BLOC
 
 ## Getting Started
 
