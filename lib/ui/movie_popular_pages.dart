@@ -1,8 +1,11 @@
-import 'package:dio_sample_app/api/api_repository.dart';
-import 'package:dio_sample_app/ui/chip_genre_movies.dart';
+import 'package:dio_sample_app/bloc/movies_bloc.dart';
+import 'package:dio_sample_app/bloc/movies_event.dart';
+import 'package:dio_sample_app/bloc/movies_state.dart';
 import 'package:dio_sample_app/model/popular_movie_item.dart';
+import 'package:dio_sample_app/ui/chip_genre_movies.dart';
 import 'package:dio_sample_app/ui/shimmer_movies.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MoviePopularPages extends StatefulWidget {
   @override
@@ -10,7 +13,11 @@ class MoviePopularPages extends StatefulWidget {
 }
 
 class _MoviePopularPagesState extends State<MoviePopularPages> {
-  ApiRepository _apiRepository = ApiRepository();
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<MovieBloc>(context).add(LoadPopularMovie());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,46 +25,21 @@ class _MoviePopularPagesState extends State<MoviePopularPages> {
       appBar: AppBar(
         title: Text('Movie Popular'),
       ),
-      body: Container(
-        child: FutureBuilder(
-            future: _apiRepository.getMoviePopular,
-            builder: (BuildContext context, AsyncSnapshot<List<PopularMovieItem>> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                  return Container(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                  break;
-                case ConnectionState.waiting:
-                  return Container(
-                    child: Center(
-                      child: ShimmerMovies(),
-                    ),
-                  );
-                  break;
-                case ConnectionState.active:
-                  return Container(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                  break;
-                case ConnectionState.done:
-                  if (snapshot.hasError) {
-                    return Container(
-                      child: Center(
-                        child: Text("Failed get data"),
-                      ),
-                    );
-                  } else {
-                    return BuildList(listMoviePopular: snapshot.data,);
-                  }
-                  break;
-              }
-              return Center(child: Text(""));
-            }),
+      body: BlocBuilder<MovieBloc, MoviesState>(
+          builder: (context, state){
+            if(state is MoviesHasData){
+              return BuildList(listMoviePopular: state.movieList);
+            }else if(state is MoviesLoading){
+              return ShimmerMovies();
+            }else if(state is MoviesError){
+              return Center(child: Text(state.errorMessage));
+            }else if(state is MoviesNoInternetConnection){
+              return Center(child: Text(state.message),);
+            }
+            else {
+              return Center(child: Text(''));
+            }
+          }
       ),
     );
   }

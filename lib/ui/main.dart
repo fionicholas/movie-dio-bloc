@@ -1,5 +1,8 @@
+import 'package:dio_sample_app/api/api_provider.dart';
+import 'package:dio_sample_app/bloc/movies_bloc.dart';
 import 'package:dio_sample_app/ui/movie_popular_pages.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,7 +30,13 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MoviePopularPages(),
+      home:
+      BlocProvider(
+        create: (context) {
+          return MovieBloc(repository: ApiProvider());
+        },
+        child: MoviePopularPages(),
+      ),
     );
   }
 }
